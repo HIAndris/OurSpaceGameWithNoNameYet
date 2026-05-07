@@ -2,35 +2,139 @@ package bif.hia;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
+import com.badlogic.gdx.graphics.g3d.shaders.DepthShader;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.ScreenUtils;
+import net.mgsx.gltf.loaders.glb.GLBAssetLoader;
+import net.mgsx.gltf.loaders.gltf.GLTFAssetLoader;
+import net.mgsx.gltf.scene3d.scene.Scene;
+import net.mgsx.gltf.scene3d.scene.SceneAsset;
+import net.mgsx.gltf.scene3d.scene.SceneManager;
+import net.mgsx.gltf.scene3d.shaders.PBRDepthShaderProvider;
+import net.mgsx.gltf.scene3d.shaders.PBRShaderConfig;
+import net.mgsx.gltf.scene3d.shaders.PBRShaderProvider;
 
-/** First screen of the application. Displayed after the application is created. */
+import static bif.hia.Main.assetManager;
+
 public class FirstScreen implements Screen {
-    float r = 0f;
-    float g = 1f;
-    float b = 0f;
+    private SceneManager sceneManager;
+    private PerspectiveCamera camera;
+
+    private SceneAsset sceneAsset;
+    private Scene scene;
+
+    private Vector3 camPosition =  new Vector3(0f, 5f, 0f);
+
+    private float roundCycle = 0f;
+    private float distance = 10f;
+    private float centerHeight = 2f;
+    private float sunDirection = 0f;
+
+    DirectionalLight sun;
+
 
     @Override
     public void show() {
-        // Prepare your screen here.
+        sceneManager = new SceneManager();
+
+        camera = new PerspectiveCamera(60f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        camera.near = 0.1f;
+        camera.far = 1000f;
+        camera.position.set(camPosition);
+        camera.lookAt(0f, centerHeight, 0f);
+        camera.update();
+
+        assetManager.setLoader(SceneAsset.class, ".glb", new GLBAssetLoader());
+        assetManager.setLoader(SceneAsset.class, ".gltf", new GLTFAssetLoader());
+
+        assetManager.setLoader(SceneAsset.class, ".glb", new GLBAssetLoader());
+        assetManager.setLoader(SceneAsset.class, ".gltf", new GLTFAssetLoader());
+        assetManager.load("proportional_low_poly_man__free_download.glb", SceneAsset.class);
+
+        assetManager.finishLoading();
+
+        sceneManager.setCamera(camera);
+
+        sceneAsset = assetManager.get("proportional_low_poly_man__free_download.glb", SceneAsset.class);
+        scene = new Scene(sceneAsset.scene);
+        sceneManager.addScene(scene);
+
+        sun = new DirectionalLight();
+        sun.set(1f, 1f, 1f, (float) Math.sin(sunDirection), -0.8f, (float) Math.cos(sunDirection));
+        sceneManager.environment.add(sun);
+
+        sceneManager.setAmbientLight(0.2f);
     }
 
     @Override
     public void render(float delta) {
-        // Draw your screen here. "delta" is the time since last render in seconds.
-        com.badlogic.gdx.utils.ScreenUtils.clear(r, g, b, 1f);
+        ScreenUtils.clear(0f, 0f, 0f, 1f, true);
+
+        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+            camPosition.y += 3 * delta;
+            System.out.printf("camY: %f\n", camPosition.y);
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+            camPosition.y -= 3 * delta;
+            System.out.printf("camY: %f\n", camPosition.y);
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+            distance += 3 * delta;
+            System.out.printf("distance: %f\n", distance);
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+            distance -= 3 * delta;
+            System.out.printf("distance: %f\n", distance);
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+            centerHeight += 3 * delta;
+            System.out.printf("centerHeight: %f\n", centerHeight);
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+            centerHeight -= 3 * delta;
+            System.out.printf("centerHeight: %f\n", centerHeight);
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
+            sunDirection += 3 * delta;
+            sun.set(1f, 1f, 1f, (float) Math.sin(sunDirection), -0.8f, (float) Math.cos(sunDirection));
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.E)) {
+            sunDirection -= 3 * delta;
+            sun.set(1f, 1f, 1f, (float) Math.sin(sunDirection), -0.8f, (float) Math.cos(sunDirection));
+        }
+
+        roundCycle += delta / 2;
+        camPosition.x = (float) Math.sin(roundCycle) * distance;
+        camPosition.z = (float) Math.cos(roundCycle) * distance;
+
+        camera.position.set(camPosition);
+        camera.lookAt(0f, centerHeight, 0f);
+        camera.up.set(0f, 1f, 0f);
+
+        if (roundCycle > 1000f) {
+            roundCycle = 0f;
+        }
+
+        camera.update();
+        sceneManager.update(delta);
+        sceneManager.render();
     }
 
     @Override
     public void resize(int width, int height) {
-        // If the window is minimized on a desktop (LWJGL3) platform, width and height are 0, which causes problems.
-        // In that case, we don't resize anything, and wait for the window to be a normal size before updating.
         if(width <= 0 || height <= 0) return;
 
-        // Resize your screen here. The parameters represent the new window size.
         Graphics.DisplayMode mode = Gdx.graphics.getDisplayMode();
-        r = (float) width / mode.width;
-        b = (float) height / mode.height;
+        System.out.printf("Window width changed to: %d\n", mode.width);
+        System.out.printf("Window height changed to: %d\n", mode.height);
+
+        camera.viewportWidth = width;
+        camera.viewportHeight = height;
+        camera.update();
     }
 
     @Override
@@ -50,6 +154,7 @@ public class FirstScreen implements Screen {
 
     @Override
     public void dispose() {
-        // Destroy screen's assets here.
+        if (sceneManager != null) sceneManager.dispose();
+        if (assetManager != null) assetManager.dispose();
     }
 }

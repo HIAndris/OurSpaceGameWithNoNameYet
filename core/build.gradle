@@ -6,6 +6,7 @@ dependencies {
   api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
   api "com.badlogicgames.gdx:gdx:$gdxVersion"
   api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+  api "com.github.mgsx-dev.gdx-gltf:gltf:$gdxGltfVersion"
 
   if(enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
