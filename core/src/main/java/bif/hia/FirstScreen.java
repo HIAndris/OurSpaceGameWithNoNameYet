@@ -6,7 +6,6 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
-import com.badlogic.gdx.graphics.g3d.shaders.DepthShader;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import net.mgsx.gltf.loaders.glb.GLBAssetLoader;
@@ -14,9 +13,6 @@ import net.mgsx.gltf.loaders.gltf.GLTFAssetLoader;
 import net.mgsx.gltf.scene3d.scene.Scene;
 import net.mgsx.gltf.scene3d.scene.SceneAsset;
 import net.mgsx.gltf.scene3d.scene.SceneManager;
-import net.mgsx.gltf.scene3d.shaders.PBRDepthShaderProvider;
-import net.mgsx.gltf.scene3d.shaders.PBRShaderConfig;
-import net.mgsx.gltf.scene3d.shaders.PBRShaderProvider;
 
 import static bif.hia.Main.assetManager;
 
@@ -53,13 +49,13 @@ public class FirstScreen implements Screen {
 
         assetManager.setLoader(SceneAsset.class, ".glb", new GLBAssetLoader());
         assetManager.setLoader(SceneAsset.class, ".gltf", new GLTFAssetLoader());
-        assetManager.load("proportional_low_poly_man__free_download.glb", SceneAsset.class);
+        assetManager.load("gleuxus.glb", SceneAsset.class);
 
         assetManager.finishLoading();
 
         sceneManager.setCamera(camera);
 
-        sceneAsset = assetManager.get("proportional_low_poly_man__free_download.glb", SceneAsset.class);
+        sceneAsset = assetManager.get("gleuxus.glb", SceneAsset.class);
         scene = new Scene(sceneAsset.scene);
         sceneManager.addScene(scene);
 
