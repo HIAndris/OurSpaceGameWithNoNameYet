@@ -6,6 +6,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
+import com.badlogic.gdx.graphics.g3d.shaders.DepthShader;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import net.mgsx.gltf.loaders.glb.GLBAssetLoader;
@@ -13,6 +14,9 @@ import net.mgsx.gltf.loaders.gltf.GLTFAssetLoader;
 import net.mgsx.gltf.scene3d.scene.Scene;
 import net.mgsx.gltf.scene3d.scene.SceneAsset;
 import net.mgsx.gltf.scene3d.scene.SceneManager;
+import net.mgsx.gltf.scene3d.shaders.PBRDepthShaderProvider;
+import net.mgsx.gltf.scene3d.shaders.PBRShaderConfig;
+import net.mgsx.gltf.scene3d.shaders.PBRShaderProvider;
 
 import static bif.hia.Main.assetManager;
 
@@ -35,7 +39,16 @@ public class FirstScreen implements Screen {
 
     @Override
     public void show() {
-        sceneManager = new SceneManager();
+        PBRShaderConfig config = PBRShaderProvider.createDefaultConfig();
+        DepthShader.Config depthConfig = PBRDepthShaderProvider.createDefaultConfig();
+
+        config.numBones = 60;
+        depthConfig.numBones = 60;
+
+        sceneManager = new SceneManager(
+            new PBRShaderProvider(config),
+            new PBRDepthShaderProvider(depthConfig)
+        );
 
         camera = new PerspectiveCamera(60f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.near = 0.1f;
