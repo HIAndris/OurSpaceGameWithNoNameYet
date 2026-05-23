@@ -1,28 +1,23 @@
 package bif.hia;
 
+import bif.hia.configs.GameConfig;
+import bif.hia.graphics.AssetLoader;
+
+import bif.hia.graphics.View;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
-import com.badlogic.gdx.graphics.g3d.shaders.DepthShader;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
-import net.mgsx.gltf.loaders.glb.GLBAssetLoader;
-import net.mgsx.gltf.loaders.gltf.GLTFAssetLoader;
 import net.mgsx.gltf.scene3d.scene.Scene;
 import net.mgsx.gltf.scene3d.scene.SceneAsset;
 import net.mgsx.gltf.scene3d.scene.SceneManager;
-import net.mgsx.gltf.scene3d.shaders.PBRDepthShaderProvider;
-import net.mgsx.gltf.scene3d.shaders.PBRShaderConfig;
-import net.mgsx.gltf.scene3d.shaders.PBRShaderProvider;
-
-import static bif.hia.Main.assetManager;
 
 public class FirstScreen implements Screen {
     private SceneManager sceneManager;
-    private PerspectiveCamera camera;
+    private View view;
 
     private SceneAsset sceneAsset;
     private Scene scene;
@@ -36,39 +31,19 @@ public class FirstScreen implements Screen {
 
     DirectionalLight sun;
 
-
     @Override
     public void show() {
-        PBRShaderConfig config = PBRShaderProvider.createDefaultConfig();
-        DepthShader.Config depthConfig = PBRDepthShaderProvider.createDefaultConfig();
+        sceneManager = GameConfig.configureSceneManager();
 
-        config.numBones = 60;
-        depthConfig.numBones = 60;
+        view = new View();
 
-        sceneManager = new SceneManager(
-            new PBRShaderProvider(config),
-            new PBRDepthShaderProvider(depthConfig)
-        );
+        AssetLoader.init();
+        AssetLoader.queueModel("gleuxus.glb");
+        AssetLoader.finishLoading();
 
-        camera = new PerspectiveCamera(60f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        camera.near = 0.1f;
-        camera.far = 1000f;
-        camera.position.set(camPosition);
-        camera.lookAt(0f, centerHeight, 0f);
-        camera.update();
+        sceneManager.setCamera(view.getCamera());
 
-        assetManager.setLoader(SceneAsset.class, ".glb", new GLBAssetLoader());
-        assetManager.setLoader(SceneAsset.class, ".gltf", new GLTFAssetLoader());
-
-        assetManager.setLoader(SceneAsset.class, ".glb", new GLBAssetLoader());
-        assetManager.setLoader(SceneAsset.class, ".gltf", new GLTFAssetLoader());
-        assetManager.load("gleuxus.glb", SceneAsset.class);
-
-        assetManager.finishLoading();
-
-        sceneManager.setCamera(camera);
-
-        sceneAsset = assetManager.get("gleuxus.glb", SceneAsset.class);
+        sceneAsset = AssetLoader.getModel("gleuxus.glb");
         scene = new Scene(sceneAsset.scene);
         sceneManager.addScene(scene);
 
@@ -120,15 +95,15 @@ public class FirstScreen implements Screen {
         camPosition.x = (float) Math.sin(roundCycle) * distance;
         camPosition.z = (float) Math.cos(roundCycle) * distance;
 
-        camera.position.set(camPosition);
-        camera.lookAt(0f, centerHeight, 0f);
-        camera.up.set(0f, 1f, 0f);
+        view.camera.position.set(camPosition);
+        view.camera.lookAt(0f, centerHeight, 0f);
+        view.camera.up.set(0f, 1f, 0f);
 
         if (roundCycle > 1000f) {
             roundCycle = 0f;
         }
 
-        camera.update();
+        view.update();
         sceneManager.update(delta);
         sceneManager.render();
     }
@@ -141,9 +116,9 @@ public class FirstScreen implements Screen {
         System.out.printf("Window width changed to: %d\n", mode.width);
         System.out.printf("Window height changed to: %d\n", mode.height);
 
-        camera.viewportWidth = width;
-        camera.viewportHeight = height;
-        camera.update();
+        view.camera.viewportWidth = width;
+        view.camera.viewportHeight = height;
+        view.update();
     }
 
     @Override
@@ -164,6 +139,5 @@ public class FirstScreen implements Screen {
     @Override
     public void dispose() {
         if (sceneManager != null) sceneManager.dispose();
-        if (assetManager != null) assetManager.dispose();
     }
 }

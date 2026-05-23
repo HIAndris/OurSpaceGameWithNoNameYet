@@ -30,6 +30,22 @@ public class View {
         viewport = new ExtendViewport(GameConfig.VIEWPORT_MIN_WORLD_WIDTH, GameConfig.VIEWPORT_MIN_WORLD_HEIGHT, camera);
     }
 
+    public View(CameraMode srartCameraMode) {
+        applyCameraMode = new EnumMap<>(CameraMode.class);
+        applyCameraMode.put(CameraMode.TOP_DOWN, this::applyTopDownCamera);
+        applyCameraMode.put(CameraMode.INSPECT, this::applyInspectCamera);
+
+        camera = new PerspectiveCamera();
+        setCameraMode(srartCameraMode);
+        camera.viewportWidth = Gdx.graphics.getWidth();
+        camera.viewportHeight = Gdx.graphics.getHeight();
+        viewport = new ExtendViewport(GameConfig.VIEWPORT_MIN_WORLD_WIDTH, GameConfig.VIEWPORT_MIN_WORLD_HEIGHT, camera);
+    }
+
+    public PerspectiveCamera getCamera() {
+        return camera;
+    }
+
     public void resize(int width, int height) {
         viewport.update(width, height, true);
     }
