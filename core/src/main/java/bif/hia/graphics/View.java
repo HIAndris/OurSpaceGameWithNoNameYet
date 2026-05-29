@@ -4,6 +4,7 @@ import bif.hia.configs.GameConfig;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -17,6 +18,8 @@ public class View {
     private final Map<CameraMode, Runnable> applyCameraMode;
 
     private CameraMode cameraMode = CameraMode.TOP_DOWN;
+
+    private float rotationDistance;
 
     public View() {
         applyCameraMode = new EnumMap<>(CameraMode.class);
@@ -71,6 +74,7 @@ public class View {
     }
 
     private void applyTopDownCamera() {
+        rotationDistance = GameConfig.CAMERA_TD_POSITION.z;
         camera.fieldOfView = GameConfig.FOV_TD;
         camera.position.set(GameConfig.CAMERA_TD_POSITION);
         camera.lookAt(GameConfig.CAMERA_TD_LOOK_AT);
@@ -80,11 +84,17 @@ public class View {
     }
 
     private void applyInspectCamera() {
+        rotationDistance = GameConfig.CAMERA_INS_POSITION.z;
         camera.fieldOfView = GameConfig.FOV_INS;
         camera.position.set(GameConfig.CAMERA_INS_POSITION);
         camera.lookAt(GameConfig.CAMERA_INS_LOOK_AT);
         camera.near = GameConfig.CAMERA_INS_NEAR;
         camera.far = GameConfig.CAMERA_INS_FAR;
         camera.update();
+    }
+
+    public void rotateCamera(float deg) {
+        camera.position.z = MathUtils.sinDeg(deg) * rotationDistance;
+        camera.position.x = MathUtils.cosDeg(deg) * rotationDistance;
     }
 }

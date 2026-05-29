@@ -1,5 +1,6 @@
 package bif.hia;
 
+import bif.hia.screens.GameScreen;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.assets.AssetManager;
 
@@ -7,6 +8,6 @@ import com.badlogic.gdx.assets.AssetManager;
 public class Main extends Game {
     @Override
     public void create() {
-        setScreen(new FirstScreen());
+        setScreen(new GameScreen());
     }
 }
