@@ -1,6 +1,7 @@
 package bif.hia.configs;
 
 import bif.hia.graphics.View;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g3d.shaders.DepthShader;
 import com.badlogic.gdx.math.Vector3;
 import net.mgsx.gltf.scene3d.scene.SceneManager;
@@ -12,6 +13,7 @@ public class GameConfig {
     public static final int VIEWPORT_MIN_WORLD_WIDTH = 600;
     public static final int VIEWPORT_MIN_WORLD_HEIGHT = 400;
     public static final View.CameraMode DEFAULT_CAMERA_MODE = View.CameraMode.TOP_DOWN;
+    public static final Vector3 DEFAULT_SUN_DIRECTION = new Vector3(-2, -10, -5);
 
     // CAMERA_MODE = TOP_DOWN
     public static final int FOV_TD = 70;
